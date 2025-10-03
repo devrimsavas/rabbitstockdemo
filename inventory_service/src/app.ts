@@ -10,35 +10,54 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// .env dosyasını proje kökünden yükle
-//dotenv.config({ path: path.resolve(__dirname, "../.env") });
+
 
 import express from "express";
 import { createServer } from "node:http";
 import indexRouter from "./routes/index.js";
-import db from "./models/index.js"; // 👈 aggregator import
+import db from "./models/index.js"; //  aggregator import
+
+//import populatedatabase 
+import populateDataBase from "./services/PopulateDB.js";
 
 const PORT = process.env.PORT || 3001;
 
+//SWAGGER
+import swaggerUI from "swagger-ui-express";
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerOptions from "./configuration/swaggerOptions.js";
+
+const swaggerDocs=swaggerJSDoc(swaggerOptions);
+
+
 // Debug
+/*
 console.log("PORT:", process.env.PORT);
 console.log("DB_USER:", process.env.ADMIN_USERNAME);
 console.log("DB_PASS:", process.env.ADMIN_PASSWORD);
 console.log("DB_NAME:", process.env.DATABASE_NAME);
+*/
 
 // Express app
 const app = express();
 const server = createServer(app);
-console.log("MODELS REGISTERED:", db.sequelize.models);
-// DB sync (tüm modeller index.ts içinde toplandı)
-db.sequelize.sync({ force: true }).then(() => {
-  console.log("Database and tables created!");
+//console.log("MODELS REGISTERED:", db.sequelize.models);
+// DB sync
+db.sequelize.sync({ force: false }).then(async () => {
+  console.log("Database synced");
+  await populateDataBase();
 });
+
+//swagger
+app.use("/api-docs",swaggerUI.serve,swaggerUI.setup(swaggerDocs));
+
+app.use(express.json());
 
 app.use("/", indexRouter);
 
 app.listen(PORT, () => {
   console.log(`listening at ${PORT}`);
+  console.log(`Swagger UI available at http://localhost:${PORT}/api-docs`);
 });
 
 export default app;

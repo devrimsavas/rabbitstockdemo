@@ -1,0 +1,27 @@
+### GET ALL 
+GET http://localhost:3005/allitems 
+
+###SELL ITEM
+POST http://localhost:3005/sellitem
+Content-Type: application/json
+
+{
+  "itemToSell": {
+    "name": "water",
+    "amount": 2
+  }
+}
+
+###SELL ITEM BY ID 
+POST http://localhost:3005/sellitembyid
+Content-Type: application/json 
+
+{
+  "itemToSellById": {
+    "id":10,
+    "amount":1
+  }
+}
+
+### FAKE STORE 
+GET  https://api.escuelajs.co/api/v1/products
