@@ -1,0 +1,10 @@
+###post an order 
+POST http://localhost:3006/orders 
+Content-Type: application/json
+
+{
+  "items": [
+    { "id": 1, "qty": 2 },
+    { "id": 5, "qty": 1 }
+  ]
+}

@@ -10,14 +10,12 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-
-
 import express from "express";
 import { createServer } from "node:http";
 import indexRouter from "./routes/index.js";
 import db from "./models/index.js"; //  aggregator import
 
-//import populatedatabase 
+//import populatedatabase
 import populateDataBase from "./services/PopulateDB.js";
 
 const PORT = process.env.PORT || 3001;
@@ -27,8 +25,10 @@ import swaggerUI from "swagger-ui-express";
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerOptions from "./configuration/swaggerOptions.js";
 
-const swaggerDocs=swaggerJSDoc(swaggerOptions);
+//CORS
+import cors from "cors";
 
+const swaggerDocs = swaggerJSDoc(swaggerOptions);
 
 // Debug
 /*
@@ -48,8 +48,16 @@ db.sequelize.sync({ force: false }).then(async () => {
   await populateDataBase();
 });
 
+const corsOptions: cors.CorsOptions = {
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: false,
+  optionsSuccessStatus: 204,
+};
+app.use(cors(corsOptions));
+
 //swagger
-app.use("/api-docs",swaggerUI.serve,swaggerUI.setup(swaggerDocs));
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs));
 
 app.use(express.json());
 

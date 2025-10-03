@@ -16,7 +16,7 @@ const itemService = new ItemService();
  *         description: nothing
  */
 router.get("/", (req: Request, res: Response) => {
-  res.status(200).json({ message: "it is test server" });
+  res.status(200).json({ message: "Inventory Service Main" });
 });
 
 /**
