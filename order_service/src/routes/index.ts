@@ -1,7 +1,13 @@
+//app
+
 import express from "express";
 import type { Request, Response } from "express";
 import { v4 as uuid } from "uuid";
 import { orders } from "../store.js";
+//import rabbit 
+import { getChannel } from "../rabbit.js";
+
+
 
 type OrderItem = { id:number; qty: number };
 type PostOrderBody = { items: OrderItem[] };
@@ -12,7 +18,8 @@ router.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "Order-Service Main" });
 });
 
-router.post("/orders", (req: Request, res: Response) => {
+//since we will send this request to rabbit 
+router.post("/orders", async (req: Request, res: Response) => {
   //get body
   const body = req.body as PostOrderBody;
   if (!body || !Array.isArray(body.items) || body.items.length === 0) {
@@ -31,7 +38,26 @@ router.post("/orders", (req: Request, res: Response) => {
   }
   const orderId = uuid();
   orders.set(orderId, "PENDING");
-  // TODO (bir sonraki adımda): RabbitMQ'ya publish("order.created", { orderId, items: body.items })
+  // TODO  RabbitMQ'ya publish("order.created", { orderId, items: body.items })
+
+  //publish event 
+  //this creates and publish even vioa channel we created in app.ts 
+  const channel=getChannel();
+  //exchange ? explain
+
+  const exchange="order_exchange"
+  await channel.assertExchange(exchange,"fanout",{durable:true});
+  //is is event to publish? 
+  const event={
+    type:"order.created",
+    data:{orderId,items:body.items}
+  }
+  channel.publish(
+    exchange,
+    "",
+    Buffer.from(JSON.stringify(event))
+  );
+  console.log("publish", event);
 
   return res.status(200).json({ orderId, status: "Pending" });
 });
