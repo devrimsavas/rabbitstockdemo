@@ -4,7 +4,7 @@ import { fileURLToPath } from "url";
 import db from "../models/index.js";
 
 export interface IItem {
-  name: string;
+  name?: string;
   amount: number;
   id?: number;
 }
@@ -23,7 +23,7 @@ class ItemService {
       throw new Error("this item already exists");
     }
     return await this.Item.create({
-      name: item.name,
+      name: item.name!,
       amount: item.amount,
     });
   }
