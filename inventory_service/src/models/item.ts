@@ -6,7 +6,7 @@ import type {
   InferCreationAttributes,
   CreationOptional,
 } from "sequelize";
-import sequelize from "./db.js"; // aynı instance
+import sequelize from "./db.js"; 
 
 interface ItemModel
   extends Model<
